@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>ESP Tool</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.css">
+        <link
+            href="https://fonts.googleapis.com/css?family=Orbitron"
+            rel="stylesheet"
+        />
+        <link rel="icon" href="../assets/favicon.ico" />
+         <script src="https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.js"></script>
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <h1 align="center"><p><img src="../assets/zephyr.png" width="128" height="67" style="vertical-align:middle" crossorigin></img>Zephyr ESP Tool</p></h1>
+        <h4 align="center">A web flasher to flash Github action built Zephyr RTOS ESP projects</h4>
+        <div id="safariErr" style="display:none"><p align="center" style="color:red">This tool is not supported on Safari browser!</p>
+        </div>
+        <div class="container" id="main">
+            <hr/>
+            <div id="program">
+                <h3> Program </h3>
+                <label style="display:none" id="lblConnTo">Connected to device: </label>
+
+                <br><br>
+
+                <input class="btn btn-info btn-sm" type="button" id="connectButton" value="Connect" />
+                <input class="btn btn-warning btn-sm" type="button" id="disconnectButton" value="Disconnect" />
+                <input class="btn btn-danger btn-sm" type="button" id="eraseButton" value="Erase Flash" />
+                <input class="btn btn-info btn-sm" type="button" id="programButton" value="Program" />
+                <br>
+
+                <div class="alert alert-danger alert-dismissible" id="alertDiv" style="display:none; margin-top:10px">
+                    <a href="#" class="close" aria-label="close" onclick="$('.alert').hide()">&times;</a>
+                    <span id="alertmsg"></span>
+                </div>
+                <br/>
+                <h4>Progress:</h4>
+                <br/>
+                <div class="progress" id="progressBarDiv">
+                    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <output id="list"></output>
+                <hr/>
+            </div>
+        </div>
+        <script src="index.ts" type="module"></script>
+        <script>
+            // Safari 3.0+ "[object HTMLElementConstructor]"
+            var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
+
+            if(isSafari)
+            {
+               document.getElementById("safariErr").style.display = "inline";
+               document.getElementById("main").style.display = "none";
+            }
+        </script>
+    </body>
+</html>

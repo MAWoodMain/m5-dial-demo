@@ -1,0 +1,87 @@
+name: Build
+
+on:
+  push:
+
+env:
+  BOARD: heltec_wireless_stick_lite_v3/esp32s3/procpu
+  TOOLCHAIN: xtensa-espressif_esp32s3_zephyr-elf
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.event.repository.name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Setup Zephyr project
+        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        with:
+          app-path: ${{ github.event.repository.name }}
+          toolchains: $TOOLCHAIN
+
+      - name: Build firmware
+        working-directory: ${{ github.event.repository.name }}
+        shell: bash
+        run: |
+          west build -p always -b $BOARD app
+
+      - name: Upload firmware binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: zephyr.bin
+          path: ${{ github.event.repository.name }}/build/zephyr/zephyr.bin
+
+  flasher:
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.event.repository.name }}
+
+      - name: Download firmware binary
+        uses: actions/download-artifact@v4
+        with:
+          name: zephyr.bin
+          path: ${{ github.event.repository.name }}/build/zephyr
+
+      - name: Generate flasher website
+        working-directory: ${{ github.event.repository.name }}
+        run: |
+          cd flasher
+          npm install
+          npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '${{ github.event.repository.name }}/flasher/dist'
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: flasher
+    if: github.event_name != 'pull_request'
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
