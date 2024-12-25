@@ -7,8 +7,8 @@
 
 #include <espressif/esp32s3/esp32s3_fn8.dtsi>
 #include "m5stack_dial-pinctrl.dtsi"
-#include "m5stack_dial_connectors.dtsi"
 #include <zephyr/dt-bindings/pwm/pwm.h>
+#include <zephyr/dt-bindings/display/panel.h>
 #include <dt-bindings/led/led.h>
 #include <dt-bindings/led/worldsemi_ws2812c.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
@@ -25,6 +25,7 @@
 		zephyr,flash = &flash0;
 		zephyr,code-partition = &slot0_partition;
 		zephyr,bt-hci = &esp32_bt_hci;
+		zephyr,display= &gc9a01;
 	};
 
 	aliases {
@@ -33,6 +34,7 @@
 		//pwm-0 = &ledc0;
 		i2c-0 = &i2c0;
 		led-strip = &status_rgb_led;
+		backlight = &backlight;
 	};
 
 	gpio_keys {
@@ -45,17 +47,52 @@
 			zephyr,code = <INPUT_KEY_0>;
 		};
 	};
+
+
+	leds {
+		compatible = "gpio-leds";
+		backlight: led_0 {
+			gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
+			label = "Backlight";
+		};
+	};
+
+	/* MIPI DBI */
+	mipi_dbi {
+		compatible = "zephyr,mipi-dbi-spi";
+		spi-dev = <&spi2>;
+		dc-gpios = <&gpio0 4 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
+		write-only;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		gc9a01: gc9a01@0 {
+			status = "okay";
+			compatible = "galaxycore,gc9x01x";
+			reg = <0>;
+			mipi-max-frequency = <100000000>;
+			pixel-format = <PANEL_PIXEL_FORMAT_RGB_888>;
+			display-inversion;
+			width = <240>;
+			height = <240>;
+		};
+	};
+
+
+	qdec {
+		compatible = "gpio-qdec";
+		status = "okay";
+		gpios = <&gpio1 40 GPIO_ACTIVE_LOW>, <&gpio1 41 GPIO_ACTIVE_LOW>;
+		steps-per-period = <4>;
+		zephyr,axis = <INPUT_REL_WHEEL>;
+		sample-time-us = <2000>;
+		idle-timeout-ms = <200>;
+	};
 };
 
 &usb_serial {
 	status = "okay";
-};
-
-&uart0 {
-	status = "okay";
-	current-speed = <115200>;
-	pinctrl-0 = <&uart0_default>;
-	pinctrl-names = "default";
 };
 
 &i2c0 {
@@ -77,7 +114,7 @@
 };
 
 &mcpwm0 {
-	status = "okay";
+	status = "disabled";
 	pinctrl-0 = <&mcpwm0_default>;
 	pinctrl-names = "default";
 	prescale = <255>;
