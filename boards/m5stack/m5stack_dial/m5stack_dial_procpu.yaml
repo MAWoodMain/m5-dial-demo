@@ -1,0 +1,16 @@
+identifier: m5stack_dial/esp32s3/procpu
+name: M5Stack Dial PROCPU
+type: mcu
+arch: xtensa
+toolchain:
+  - zephyr
+supported:
+  - gpio
+  - i2c
+  - spi
+  - watchdog
+  - uart
+  - pwm
+  - pinmux
+  - nvs
+vendor: m5stack

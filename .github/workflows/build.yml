@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  BOARD: heltec_wireless_stick_lite_v3/esp32s3/procpu
+  BOARD: m5stack_dial/esp32s3/procpu
   TOOLCHAIN: xtensa-espressif_esp32s3_zephyr-elf
 
 jobs:

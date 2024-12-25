@@ -1,0 +1,6 @@
+board:
+  name: m5stack_dial
+  full_name: M5Dial
+  vendor: m5stack
+  socs:
+  - name: esp32s3
